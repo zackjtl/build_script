@@ -21,8 +21,7 @@ src_clone ()
 					-b nds32-6.3.0-open gcc-6.3.0
 	git clone https://github.com/andestech/glibc.git \
 					-b nds32-glibc-2.25 glibc-2.25
-	git clone https://github.com/andestech/linux.git -b nds32-4.16-rc1-v7
-	
+	git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 	#Generate host-tool
 	cd gcc-6.3.0
 	sh ./contrib/download_prerequisites
