@@ -16,14 +16,14 @@ src_clone ()
 
 	cd $src_folder
 	git clone https://github.com/andestech/binutils.git \
-					-b bsp-v4_1_0-branch-open binutils-2.24
+					-b nds32-binutils-2.30-branch-open binutils-2.30
 	git clone https://github.com/andestech/gcc.git \
-					-b nds32-6.3.0-open gcc-6.3.0
+					-b nds32-8.1.0-upstream gcc-8.1.0
 	git clone https://github.com/andestech/glibc.git \
-					-b nds32-glibc-2.25 glibc-2.25
+					-b nds32-glibc-2.27-v0 glibc-2.27
 	git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 	#Generate host-tool
-	cd gcc-6.3.0
+	cd gcc-8.1.0
 	sh ./contrib/download_prerequisites
 
 	cd $work_folder
@@ -42,7 +42,7 @@ clean_build ()
 #----------
 build_binutils ()
 {
-	if [ ! -d "$src_folder"/binutils-2.24 ];then
+	if [ ! -d "$src_folder"/binutils-2.30 ];then
 	       echo "no binutils source code" 
 	       exit 1
 	fi
@@ -50,7 +50,7 @@ build_binutils ()
 	
 	cd "$build_folder"/binutils
 	
-	"$src_folder"/binutils-2.24/configure \
+	"$src_folder"/binutils-2.30/configure \
 	--prefix=$toolchain_folder \
 	--target=nds32le-linux \
 	--with-arch=v3 \
@@ -71,7 +71,7 @@ build_binutils ()
 #----------
 build_bootstrap_gcc ()
 {
-	if [ ! -d "$src_folder"/gcc-6.3.0 ];then
+	if [ ! -d "$src_folder"/gcc-8.1.0 ];then
 	       	echo "no gcc source code"
 		exit 1
 	fi
@@ -81,7 +81,7 @@ build_bootstrap_gcc ()
 	
 	
 	
-	"$src_folder"/gcc-6.3.0/configure \
+	"$src_folder"/gcc-8.1.0/configure \
 	--target=nds32le-linux \
 	--prefix=$toolchain_folder \
 	--with-pkgversion="$build_day"_nds32le-linux-glibc \
@@ -148,7 +148,7 @@ build_kernel_header ()
 #----------
 build_glibc_headers ()
 {
-	if [ ! -d "$src_folder"/glibc-2.25 ];then
+	if [ ! -d "$src_folder"/glibc-2.27 ];then
 	       echo "no linux glibc code" 
 	       exit 1
 	fi
@@ -157,7 +157,7 @@ build_glibc_headers ()
 	cd "$build_folder"/glibc
 	PATH=$toolchain_folder/bin:$PATH \
 	libc_cv_forced_unwind=yes \
-	$src_folder/glibc-2.25/configure \
+	$src_folder/glibc-2.27/configure \
 	--prefix=/usr \
 	--build=$MACHTYPE \
 	--host=nds32le-linux \
@@ -199,14 +199,14 @@ build_glibc_headers ()
 #----------
 build_libgcc ()
 {
-	if [ ! -d "$src_folder"/gcc-6.3.0 ];then
+	if [ ! -d "$src_folder"/gcc-8.1.0 ];then
 	       	echo "no gcc source code"
 		exit 1
 	fi
 	mkdir -p "$build_folder"/gcc_2
 
 	cd "$build_folder"/gcc_2
-	"$src_folder"/gcc-6.3.0/configure \
+	"$src_folder"/gcc-8.1.0/configure \
 	--target=nds32le-linux \
 	--prefix="$toolchain_folder" \
 	--with-pkgversion="$build_day"_nds32le-linux-glibc \
@@ -246,7 +246,7 @@ build_libgcc ()
 #----------
 build_glibc ()
 {
-	if [ ! -d "$src_folder"/glibc-2.25 ];then
+	if [ ! -d "$src_folder"/glibc-2.27 ];then
 	       echo "no linux glibc code" 
 	       exit 1
 	fi
@@ -267,7 +267,7 @@ build_glibc ()
 #----------
 build_final_gcc ()
 {
-	if [ ! -d "$src_folder"/gcc-6.3.0 ];then
+	if [ ! -d "$src_folder"/gcc-8.1.0 ];then
 	       	echo "no gcc source code"
 		exit 1
 	fi
@@ -275,7 +275,7 @@ build_final_gcc ()
 	cd "$build_folder"/final_gcc
 
 	PATH=$toolchain_folder/bin:$PATH \
-	"$src_folder"/gcc-6.3.0/configure \
+	"$src_folder"/gcc-8.1.0/configure \
 	--target=nds32le-linux \
 	--prefix="$toolchain_folder" \
 	--with-pkgversion="$build_day"_nds32le-linux-glibc-v3-4.x \
