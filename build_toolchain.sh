@@ -143,26 +143,56 @@ build_newlib()
 #-------------------------------------------------------------------
 build_final_gcc()
 {
-  echo '=============== START build_final_gcc ================'
+	echo '=============== START build_final_gcc =================='
+	if [ ! -d "$src_folder"/gcc-8.1.0 ];then
+	       	echo "no gcc source code"
+		exit 1
+	fi
+	mkdir -p "$build_folder"/final_gcc
+	cd "$build_folder"/final_gcc
 
-  mkdir -p "$build_folder"/newlib
+	PATH=$toolchain_folder/bin:$PATH \
+	"$src_folder"/gcc-8.1.0/configure \
+	--target=nds32le-elf \
+	--prefix="$toolchain_folder" \
+	--with-pkgversion="$build_day"_nds32le-elf-glibc-v3-4.x \
+	--disable-nls \
+	--enable-languages=c,c++ \
+	--with-arch=v3 \
+	--with-cpu=n9 \
+	--enable-default-relax=no \
+	--with-newlib \
+	--with-nds32-lib=newlib \
+	--disable-libsanitizer \
+	--disable-multilib \
+	--enable-shared \
+	--enable-tls \
+	--disable-libssp \
+	--with-sysroot="$toolchain_folder"/nds32le-elf/sysroot \
+	CFLAGS="-O2 -g" \
+	CXXFLAGS="-O2 -g" \
+	--enable-checking=release \
+	LDFLAGS=--static \
+	CFLAGS_FOR_TARGET="-O2 -g" \
+	CXXFLAGS_FOR_TARGET="-O2 -g" \
+	LDFLAGS_FOR_TARGET=
 
-  cd "$build_folder"/newlib
+#--with-nds32-lib=newlib \
+	
 
-  "$src_folder"/newlib/configure \
-    --target=nds32le-elf \
-    --prefix=$toolchain_folder \
-    --with-arch=v3 \
-    --with-cpu=n9
+	PATH=$toolchain_folder/bin:$PATH \
+	make -j8
 
-  PATH=$toolchain_folder/bin:$PATH \
-  make
+	PATH=$toolchain_folder/bin:$PATH \
+	make install
 
-  PATH=$toolchain_folder/bin:$PATH \
-  make install
 
-  cd $work_folder
-  echo '=============== END build_final_gcc ================'
+	# Copy all shared library which is created by gcc to sysroot folder
+	find "$toolchain_folder"/nds32le-elf/lib -name "*.so*" \
+	   | xargs -i cp -ar {} "$toolchain_folder"/nds32le-elf/sysroot/lib
+	
+	cd $work_folder
+  echo '=============== END build_final_gcc =================='
 }
 #-------------------------------------------------------------------
 # The directly execute scripts
